@@ -3,7 +3,7 @@ import Joi from "joi";
 const roles = ["admin", "manager", "staff"];
 
 export const registerUserValidator = Joi.object({
-  username: Joi.string().required(),
+  name: Joi.string().required(),
   email: Joi.string().required(),
   password: Joi.string().required(),
   role: Joi.string()
@@ -14,7 +14,7 @@ export const registerUserValidator = Joi.object({
 
 
 export const loginUserValidator = Joi.object({
-  userName: Joi.string().optional(),
+  name: Joi.string().optional(),
   email: Joi.string().optional(),
   password: Joi.string().required(),
 });

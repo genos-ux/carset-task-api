@@ -3,7 +3,7 @@ import { markTaskCompleted, taskValidator } from "../validators/tasks.js";
 
 export const createTask = async(req,res,next) => {
     try {
-        const {value,error} = taskValidator(req.body);
+        const {value,error} = taskValidator.validate(req.body);
     
         if(error) return res.status(422).json(error);
     
@@ -36,19 +36,10 @@ export const editTask = async(req,res,next) => {
     try {
         //Fetch product from database.
         const taskId = req.params.id;
-        
-        // const { title, description, status, dueDate, assignedTo } = req.body;
-        const {error, value} = taskValidator.validate(req.body, {abortEarly:false});
-        if (error) {
-          return res.status(400).json({
-            message: "Validation failed",
-            errors: error.details.map((d) => d.message),
-          });
-        }
 
         const updatedTask = await TaskModel.findByIdAndUpdate(
           taskId,
-          { $set: value }, // 👈 Set only the validated fields
+          { $set: req.body }, // 👈 Set only the validated fields
           { new: true, runValidators: true }
         );
 
@@ -83,7 +74,7 @@ export const markCompleted = async(req,res,next) => {
     
         return res
           .status(200)
-          .json({ message: "Advert updated successfully", ad: updatedAdvert });
+          .json({ message: "Task completed successfully"});
     } catch (error) {
         next(error);
     }
@@ -96,6 +87,8 @@ export const deleteTask = async(req,res,next) => {
         const deletedTask = await TaskModel.findByIdAndDelete(taskId);
 
         if(!deletedTask) return next({ status: 404, message: "Task not found" });
+
+        return res.status(200).json({message: "Task deleted successfully."});
 
 
     } catch (error) {

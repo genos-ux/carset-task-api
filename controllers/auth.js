@@ -17,7 +17,7 @@ export const registerUser = async(req,res,next) => {
   
     // Check if user does not exist already
     const existingUser = await UserModel.findOne({
-      $or: [{ username: value.username }, { email: value.email }],
+      $or: [{ name: value.name }, { email: value.email }],
     });
   
     if (existingUser)
@@ -25,7 +25,7 @@ export const registerUser = async(req,res,next) => {
   
     const passwordHash = bcrypt.hashSync(value.password, 10);
   
-    await UserModel.create({
+    const user = await UserModel.create({
       ...value,
       password: passwordHash,
     });
@@ -34,7 +34,6 @@ export const registerUser = async(req,res,next) => {
     res.status(201).json({
       message: "User registered successfully",
       user: {
-        id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -49,22 +48,28 @@ export const loginUser = async(req,res,next) => {
 try {
   // Validate user information
     const { error, value } = loginUserValidator.validate(req.body);
-  
-    if (error) return res.status(422).json(error);
+
+    if (error) {
+      return next({
+        status: 400,
+        message: "Validation failed",
+        details: error.details,
+      });
+    }
   
     // Find matching user record in database
     const user = await UserModel.findOne({
-      $or: [{ username: value.username }, { email: value.email }],
+      $or: [{ name: value.name }, { email: value.email }],
     });
   
     if (!user) {
-      return res.status(404).json("User does not exist!");
+      return next({status:404, message: "User does not exist!"});
     }
   
     // Compare incoming password with saved password
     const comparePassword = bcrypt.compareSync(value.password, user.password);
   
-    if(!comparePassword) return res.status(401).json("Invalid credentials!");
+    if(!comparePassword) return next({status:401, message: "Invalid credentials!"})
   
     // Generate access token for user.
     const accessToken = jwt.sign({id: user._id},process.env.JWT_SECRET_KEY,{expiresIn:'2h'});
@@ -81,4 +86,3 @@ try {
   next(error);
 }
 }
-

@@ -6,6 +6,8 @@ const statusEnum = ["pending", "in_progress","completed","cancelled"];
 
 const priorityLevelEnum = ["High","Low","Medium"]
 
+const statusCompleteEnum = ["completed"]
+
 export const taskValidator = Joi.object({
   title: Joi.string().required(),
   description: Joi.string().required(),
@@ -17,11 +19,10 @@ export const taskValidator = Joi.object({
     .required(),
   status: Joi.string()
     .valid(...statusEnum)
-    .default("pending")
-    .required(),
+    .default("pending"),
   dueDate: Joi.date()
 });
 
 export const markTaskCompleted = Joi.object({
-  status: Joi.string().valid(["completed"]).required()
+  status: Joi.string().valid(...statusCompleteEnum).required()
 })
