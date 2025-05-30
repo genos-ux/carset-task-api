@@ -6,14 +6,21 @@ const taskSchema = Schema(
     description: String,
     status: {
       type: String,
-      enum: ["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"],
+      enum: ["pending", "in_progress", "completed", "cancelled"],
       default: "PENDING",
     },
+    categories: {
+        type:String,
+        enum: ["Fleet","Support","Marketing"]
+    },
+    priorityLevel:{
+        type:String,
+        enum: ["High","Low","Medium"]
+    },
     dueDate: Date,
-    assignedTo: { type: Types.ObjectId, ref: "User" },
     userId: { type: Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );
 
-module.exports = model("Task", taskSchema);
+export const TaskModel = model("Task", taskSchema);
