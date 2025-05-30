@@ -1,5 +1,5 @@
 import { UserModel } from "../models/user.js";
-import { loginUserValidator, registerUserValidator } from "../validators/users.js"
+import { loginUserValidator, registerUserValidator } from "../validators/auth.js"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 
