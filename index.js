@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import 'dotenv/config';
 import rootRoute from "./routes/index.js";
 import cors from 'cors';
+import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 
@@ -13,10 +14,12 @@ await mongoose.connect(process.env.MONGO_URI)
 .catch(err => console.log('Error while connecting db'))
 
 app.use(express.json());
+
 app.use(cors());
 
 app.use('/api', rootRoute);
 
+app.use(errorHandler);
 
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT} `);

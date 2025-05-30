@@ -1,15 +1,27 @@
 import Joi from "joi";
 
-// Define allowed category values
-const categoriesEnum = ["Shirt", "Pants", "Shoes", "Accessories"];
+const categoriesEnum = ["Fleet", "Support", "Marketing"];
 
-export const advertValidator = Joi.object({
+const statusEnum = ["pending", "in_progress","completed","cancelled"];
+
+const priorityLevelEnum = ["High","Low","Medium"]
+
+export const taskValidator = Joi.object({
   title: Joi.string().required(),
-  price: Joi.number().required(),
   description: Joi.string().required(),
-  pictures: Joi.array().items(Joi.string().required()),
   categories: Joi.string()
     .valid(...categoriesEnum)
-    .default("Shirt")
     .required(),
+  priorityLevel: Joi.string()
+    .valid(...priorityLevelEnum)
+    .required(),
+  status: Joi.string()
+    .valid(...statusEnum)
+    .default("pending")
+    .required(),
+  dueDate: Joi.date()
 });
+
+export const markTaskCompleted = Joi.object({
+  status: Joi.string().valid(["completed"]).required()
+})
