@@ -1,6 +1,5 @@
 import {Schema, model} from "mongoose"
 
-
 const userSchema = Schema(
   {
     name: String,
@@ -15,4 +14,4 @@ const userSchema = Schema(
   { timestamps: true }
 );
 
-module.exports = model("User", userSchema);
+export const UserModel = model("User", userSchema);

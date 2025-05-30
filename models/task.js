@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 
 const taskSchema = Schema(
   {
@@ -10,8 +10,8 @@ const taskSchema = Schema(
       default: "PENDING",
     },
     dueDate: Date,
-    assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    assignedTo: { type: Types.ObjectId, ref: "User" },
+    userId: { type: Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );
