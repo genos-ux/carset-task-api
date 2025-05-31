@@ -49,7 +49,7 @@ export const editTask = async(req,res,next) => {
 
         const updatedTask = await TaskModel.findByIdAndUpdate(
           task._id,
-          { $set: req.body }, // 👈 Set only the validated fields
+          { $set: req.body },
           { new: true, runValidators: true }
         );
 

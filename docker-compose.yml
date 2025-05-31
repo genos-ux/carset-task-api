@@ -23,7 +23,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=secret123
       - MONGO_DB:carset-task
     ports:
-      -"27017:27017"
+      - "27017:27017"
     volumes:
       - mongo-data:/data/db
 
