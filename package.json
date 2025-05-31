@@ -1,12 +1,12 @@
 {
   "name": "carset-task-manager",
   "version": "1.0.0",
-  "description": "��c\u0000a\u0000r\u0000s\u0000e\u0000t\u0000-\u0000t\u0000a\u0000s\u0000k\u0000-\u0000a\u0000p\u0000i\u0000",
+  "description": "A dockerized car rental application that uses a NODEJS backend, a MongoDB database, and JWT Authentication",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ."
+    "dev": "nodemon ./src/."
   },
   "repository": {
     "type": "git",
