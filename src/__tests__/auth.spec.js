@@ -8,17 +8,17 @@ jest.mock("bcrypt");
 jest.mock("../validators/auth");
 
 describe("registerUser controller", () => {
-  let req, res, next;
+  let mockRequest, mockResponse, next;
 
   beforeEach(() => {
-    req = {
+    mockRequest = {
       body: {
         name: "John Doe",
         email: "john@example.com",
         password: "Password123",
       },
     };
-    res = {
+    mockResponse = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     };
@@ -27,7 +27,7 @@ describe("registerUser controller", () => {
     // Mock validation result
     registerUserValidator.validate.mockReturnValue({
       error: null,
-      value: req.body,
+      value: mockRequest.body,
     });
   });
 
@@ -45,7 +45,7 @@ describe("registerUser controller", () => {
       password: "hashedPassword",
     });
 
-    await registerUser(req, res, next);
+    await registerUser(mockRequest, mockResponse, next);
 
     expect(UserModel.findOne).toHaveBeenCalledWith({
       $or: [{ name: "John Doe" }, { email: "john@example.com" }],
@@ -57,8 +57,8 @@ describe("registerUser controller", () => {
       password: "hashedPassword",
     });
 
-    expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.json).toHaveBeenCalledWith({
+    expect(mockResponse.status).toHaveBeenCalledWith(201);
+    expect(mockResponse.json).toHaveBeenCalledWith({
       message: "User registered successfully",
       user: {
         name: "John Doe",
@@ -75,7 +75,7 @@ describe("registerUser controller", () => {
       value: null,
     });
 
-    await registerUser(req, res, next);
+    await registerUser(mockRequest, mockResponse, next);
 
     expect(next).toHaveBeenCalledWith({
       status: 400,
@@ -83,13 +83,13 @@ describe("registerUser controller", () => {
       details: ["Invalid data"],
     });
 
-    expect(res.status).not.toHaveBeenCalled();
+    expect(mockResponse.status).not.toHaveBeenCalled();
   });
 
   it("should call next if user already exists", async () => {
     UserModel.findOne.mockResolvedValue({ email: "john@example.com" });
 
-    await registerUser(req, res, next);
+    await registerUser(mockRequest, mockResponse, next);
 
     expect(next).toHaveBeenCalledWith({
       status: 400,
@@ -103,7 +103,7 @@ describe("registerUser controller", () => {
     const error = new Error("DB error");
     UserModel.findOne.mockRejectedValue(error);
 
-    await registerUser(req, res, next);
+    await registerUser(mockRequest, mockResponse, next);
 
     expect(next).toHaveBeenCalledWith(error);
   });

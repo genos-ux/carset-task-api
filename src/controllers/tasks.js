@@ -1,110 +1,120 @@
 import { TaskModel } from "../models/task.js";
-import { markTaskCompleted, taskValidator } from "../validators/tasks.js";
+import {
+  editTaskValidator,
+  markTaskCompleted,
+  createTaskValidator,
+} from "../validators/tasks.js";
 
-export const createTask = async(req,res,next) => {
-    try {
-        //Validate task details from authenticated user.
-        const {value,error} = taskValidator.validate(req.body);
-    
-        if (error) {
-          return next({
-            message: error.details.map((d) => d.message),
-            status: 400,
-          });
-        }
-    
-        // Save product information to the database.
-        const task = await TaskModel.create({
-            ...value,
-            userId: req.auth.id
-        })
+export const createTask = async (req, res, next) => {
+  try {
+    //Validate task details from authenticated user.
+    const { value, error } = createTaskValidator.validate(req.body, {abortEarly:false});
 
-        return res.status(201).json(task);
-    } catch (error) {
-        next(error);
+    if (error) {
+      return next({
+        message: error.details.map((d) => d.message),
+        status: 400,
+      });
     }
-}
 
-export const getTasks = async(req,res,next) => {
-    try {
-        // Fetch products from database.
-        const tasks = await TaskModel.find({userId: req.auth.id});
+    // Save product information to the database.
+    const task = await TaskModel.create({
+      ...value,
+      userId: req.auth.id,
+    });
 
-        // Return response
-        res.status(200).json(tasks);
-        
-    } catch (error) {
-        next(error);
+    return res.status(201).json(task);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTasks = async (req, res, next) => {
+  try {
+    // Fetch products from database.
+    const tasks = await TaskModel.find({ userId: req.auth.id });
+
+    // Return response
+    res.status(200).json(tasks);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const editTask = async (req, res, next) => {
+  try {
+    //Validate incoming data from user.
+    const { error, value } = editTaskValidator.validate(req.body);
+
+    if (error) {
+      return next({
+        message: error.details.map((d) => d.message),
+        status: 400,
+      });
     }
-}
 
-export const editTask = async(req,res,next) => {
-    try {
-        const taskId = req.params.id;
+    const taskId = req.params.id;
 
-        //Fetch product from database.
-        const task = await TaskModel.findOne({userId: req.auth.id, _id: taskId});
+    //Fetch product from database.
+    const task = await TaskModel.findOne({ userId: req.auth.id, _id: taskId });
 
-        if(!task) return next({status:404, message: 'Task not found.'});
+    if (!task) return next({ status: 404, message: "Task not found." });
 
-        const updatedTask = await TaskModel.findByIdAndUpdate(
-          task._id,
-          { $set: req.body },
-          { new: true, runValidators: true }
-        );
+    const updatedTask = await TaskModel.findByIdAndUpdate(
+      task._id,
+      { $set: value },
+      { new: true, runValidators: true }
+    );
 
-        return res.status(200).json(updatedTask);    
-    } catch (error) {
-        next(error);
-    }
-}
+    return res.status(200).json(updatedTask);
+  } catch (error) {
+    next(error);
+  }
+};
 
-export const markCompleted = async(req,res,next) => {
-    try {
-        const { error, value } = markTaskCompleted.validate(req.body);
+export const markCompleted = async (req, res, next) => {
+  try {
+    const { error, value } = markTaskCompleted.validate(req.body);
 
-        if(error) return next({
-          message: error.details.map((d) => d.message),
-          status: 400,
-        });
+    if (error)
+      return next({
+        message: error.details.map((d) => d.message),
+        status: 400,
+      });
 
-        const taskId = req.params.id;
-        
-        //Fetch task of authenticated user.
-        const task = await TaskModel.findOne({userId: req.auth.id,_id: taskId});
+    const taskId = req.params.id;
 
-        if(!task) return next({status:404, message: 'Task not found.'})
-    
-        await TaskModel.findByIdAndUpdate(task._id,value,{new:true});
-    
-        return res
-          .status(200)
-          .json({ message: "Task completed successfully"});
-    } catch (error) {
-        next(error);
-    }
-}
+    //Fetch task of authenticated user.
+    const task = await TaskModel.findOne({ userId: req.auth.id, _id: taskId });
 
-export const deleteTask = async(req,res,next) => {
-    try {
-        const taskId = req.params.id;
+    if (!task) return next({ status: 404, message: "Task not found." });
 
-        //Fetch task for the authenticated user.
-        const task = await TaskModel.findOne({userId: req.auth.id,_id:taskId});
+    await TaskModel.findByIdAndUpdate(task._id, value, { new: true });
 
-        if (!task)
-            //Error message if the task doesn't belong to authenticated user.
-          return next({
-            status: 404,
-            message: "Task not found.",
-          });
+    return res.status(200).json({ message: "Task completed successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
 
-        await TaskModel.findByIdAndDelete(task._id);
+export const deleteTask = async (req, res, next) => {
+  try {
+    const taskId = req.params.id;
 
-        return res.status(200).json({message: "Task deleted successfully."});
+    //Fetch task for the authenticated user.
+    const task = await TaskModel.findOne({ userId: req.auth.id, _id: taskId });
 
+    if (!task)
+      //Error message if the task doesn't belong to authenticated user.
+      return next({
+        status: 404,
+        message: "Task not found.",
+      });
 
-    } catch (error) {
-        next(error);
-    }
-}
+    await TaskModel.findByIdAndDelete(task._id);
+
+    return res.status(200).json({ message: "Task deleted successfully." });
+  } catch (error) {
+    next(error);
+  }
+};
